@@ -197,7 +197,8 @@
 </div>
 
 <script>
-  const API = 'http://localhost:1608';
+  const API = 'http://localhost:3000';
+  const TUNA_API = 'http://localhost:1608';
   const MAX_MESSAGES = 8;
   const FADE_AFTER   = 4; // les messages au-delà de N s'estompent
 
@@ -276,12 +277,15 @@
   // ─── Musique TUNA ───
   async function fetchTuna() {
     try {
-      const r = await fetch(`${API}/api/tuna`);
+      const r = await fetch(`${TUNA_API}/`);
       const d = await r.json();
       const el = document.getElementById('val-audio');
 
-      if (d.playing && d.title) {
-        const label = d.artist ? `${d.artist} — ${d.title}` : d.title;
+      const status = (d.status || '').toLowerCase();
+      const artist = Array.isArray(d.artists) ? d.artists.join(', ') : (d.artists || d.artist);
+
+      if (status === 'playing' && d.title) {
+        const label = artist ? `${artist} — ${d.title}` : d.title;
         el.textContent = label;
         el.classList.remove('empty');
       } else {
