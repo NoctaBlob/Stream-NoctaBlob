@@ -30,18 +30,18 @@ class Component extends DCLogic {
     this.ctx = this.canvas.getContext('2d');
     const rand = (a, b) => a + Math.random() * (b - a);
 
-    // ===== CONFIG SCÈNE — INTRO 10 min =====
+    // ===== CONFIG SCÈNE — INTRO 5 min =====
     const SC = {
       text: ['Initialisation...', 'Specimen_NoctaBlob \u00b7 chargement'],
       main: { cx: 0.50, cy: 0.46, R: 380, cycle: 7.0 },
       ruler: 'vertical',
       mode: 'intro',           // 'intro' | 'outro' | 'live'
       timeline: {
-        grid: [0, 30],         // construction de la grille
-        text: [30, 60],        // apparition du texte
-        main: [60, 120],       // le gros blob grossit (1 min)
-        sats: [[180, 188], [240, 248], [300, 308], [360, 368], [420, 428]], // 1 blob/min
-        countdown: { total: 600, label: 'INITIALISATION', sub: 'specimen.boot' }
+        grid: [0, 15],         // construction de la grille
+        text: [15, 30],        // apparition du texte
+        main: [30, 60],        // le gros blob grossit (30s)
+        sats: [[90, 94], [120, 124], [150, 154], [180, 184], [210, 214]], // 1 blob/30s
+        countdown: { total: 300, label: 'INITIALISATION', sub: 'specimen.boot' }
       }
     };
     this.SC = SC;
