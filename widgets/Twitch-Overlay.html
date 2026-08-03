@@ -123,8 +123,12 @@
   #cell-clock { margin-left: auto; }
 
   .bar-label { font-size: 18px; color: var(--g4); letter-spacing: 2px; text-transform: uppercase; }
-  .bar-value { font-size: 28px; font-weight: 500; color: var(--spec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 620px; }
+  .bar-value { font-size: 28px; font-weight: 500; color: var(--spec); white-space: nowrap; overflow: hidden; max-width: 620px; position: relative; }
   .bar-value.empty { color: var(--g3); font-weight: 400; }
+  .bar-value .marquee-track { display: inline-flex; white-space: nowrap; }
+  .bar-value.scrolling .marquee-track { animation: marquee linear infinite; }
+  .bar-value .marquee-gap { display: inline-block; width: 64px; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* horloge */
   #cell-clock .bar-value { letter-spacing: 1px; font-size: 30px; }
@@ -286,15 +290,45 @@
 
       if (status === 'playing' && d.title) {
         const label = artist ? `${artist} — ${d.title}` : d.title;
-        el.textContent = label;
+        setMarqueeText(el, label);
         el.classList.remove('empty');
       } else {
+        el.classList.remove('scrolling');
+        el.innerHTML = '';
         el.textContent = '— en attente de lecture —';
         el.classList.add('empty');
       }
     } catch(e) {
       console.error('[TUNA]', e.message);
     }
+  }
+
+  function setMarqueeText(el, text) {
+    if (el.dataset.lastText === text) return; // évite de relancer l'anim en boucle
+    el.dataset.lastText = text;
+    el.classList.remove('scrolling');
+    el.innerHTML = `<span class="marquee-track"><span>${sanitize(text)}</span></span>`;
+
+    requestAnimationFrame(() => {
+      const track = el.querySelector('.marquee-track');
+      const single = track.firstChild;
+      const overflow = single.scrollWidth > el.clientWidth;
+
+      if (overflow) {
+        const gap = document.createElement('span');
+        gap.className = 'marquee-gap';
+        const clone = single.cloneNode(true);
+        track.appendChild(gap);
+        track.appendChild(clone);
+
+        const dist = single.scrollWidth + gap.offsetWidth;
+        const duration = Math.max(6, dist / 60); // ~60px/s
+        track.style.animationDuration = `${duration}s`;
+        el.classList.add('scrolling');
+      } else {
+        el.textContent = text;
+      }
+    });
   }
 
   function setValue(id, val) {
